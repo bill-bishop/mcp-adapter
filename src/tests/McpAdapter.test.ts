@@ -67,9 +67,14 @@ math
   assert.deepStrictEqual(toolCalls[1].args, { expression: "2 + 2" });
 
   const results = await adapter.execute(toolCalls);
+
+  // Type narrowing for unknown results
+  const r0 = results[0] as { name: string; result?: { result: string } };
+  const r1 = results[1] as { name: string; result?: { result: string } };
+
   assert.equal(results.length, 2);
-  assert(results[0].result.result.includes("London"));
-  assert(results[1].result.result.includes("2 + 2"));
+  assert(r0.result?.result.includes("London"));
+  assert(r1.result?.result.includes("2 + 2"));
 
   console.log("✅ McpAdapter parsing + execution test passed!");
 })();
