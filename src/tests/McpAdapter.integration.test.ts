@@ -18,14 +18,14 @@ const microsoftLearnService = {
         description: "Search Microsoft Learn documentation.",
         parameters: { query: "string" },
         async execute(args) {
-          return { result: `Searched Learn docs for '${args.query}'` };
+          return { searchResult: `Searched Learn docs for '${args.query}'` };
         },
       },
       microsoft_docs_fetch: {
         description: "Fetch a Microsoft Learn document by ID.",
         parameters: { id: "string" },
         async execute(args) {
-          return { result: `Fetched doc with ID '${args.id}'` };
+          return { document: `Fetched doc with ID '${args.id}'` };
         },
       },
     },
@@ -40,14 +40,14 @@ const everythingService = {
         description: "Fetch web resources.",
         parameters: { url: "string" },
         async execute(args) {
-          return { status: 200, data: `Fetched URL ${args.url}` };
+          return { fetchData: `Fetched URL ${args.url}` };
         },
       },
       filesystem_list: {
         description: "List directory contents.",
         parameters: { path: "string" },
         async execute(args) {
-          return { files: ["file1.txt", "file2.txt"], path: args.path };
+          return { directoryContents: ["file1.txt", "file2.txt"], path: args.path };
         },
       },
     },
@@ -72,7 +72,8 @@ const everythingService = {
   const results = await learnAdapter.execute(toolCalls);
 
   assert.equal(results.length, 1);
-  assert(results[0].result.result.includes("Azure Blob Storage"));
+  const r0 = results[0] as { name: string; result?: { searchResult: string } };
+  assert(r0.result?.searchResult.includes("Azure Blob Storage"));
   console.log("✅ Microsoft Learn execute mock successful");
 
   console.log("\n🧩 Integration Test: Everything MCP Mock");
@@ -91,6 +92,7 @@ const everythingService = {
   const results2 = await everythingAdapter.execute(toolCalls2);
 
   assert.equal(results2.length, 1);
-  assert(results2[0].result.data.includes("https://example.com"));
+  const r1 = results2[0] as { name: string; result?: { fetchData: string } };
+  assert(r1.result?.fetchData.includes("https://example.com"));
   console.log("✅ Everything MCP execute mock successful\n");
 })();

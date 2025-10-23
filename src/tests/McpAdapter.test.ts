@@ -15,13 +15,13 @@ const serviceConfig: McpServiceSpecification = {
       math: {
         description: "Basic calculator",
         async execute(args) {
-          return { result: `Evaluated: ${args.expression}` };
+          return { mathResult: `Evaluated: ${args.expression}` };
         },
       },
       weather: {
         description: "Weather info",
         async execute(args) {
-          return { result: `Weather for ${args.city}` };
+          return { weatherData: `Weather for ${args.city}` };
         },
       },
     },
@@ -68,13 +68,12 @@ math
 
   const results = await adapter.execute(toolCalls);
 
-  // Type narrowing for unknown results
-  const r0 = results[0] as { name: string; result?: { result: string } };
-  const r1 = results[1] as { name: string; result?: { result: string } };
+  const r0 = results[0] as { name: string; result?: { weatherData: string } };
+  const r1 = results[1] as { name: string; result?: { mathResult: string } };
 
   assert.equal(results.length, 2);
-  assert(r0.result?.result.includes("London"));
-  assert(r1.result?.result.includes("2 + 2"));
+  assert(r0.result?.weatherData.includes("London"));
+  assert(r1.result?.mathResult.includes("2 + 2"));
 
   console.log("✅ McpAdapter parsing + execution test passed!");
 })();
