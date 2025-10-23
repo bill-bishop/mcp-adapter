@@ -1,5 +1,7 @@
 # 🧩 MCP Adapter
 
+[![Build Status](https://github.com/bill-bishop/mcp-adapter/actions/workflows/build.yml/badge.svg)](https://github.com/bill-bishop/mcp-adapter/actions/workflows/build.yml)
+
 A minimal, **purely functional** adapter for MCP service specifications. Parsing behavior is fully configurable and swappable — designed for clean separation between data orchestration and string/regex parsing.
 
 ---
