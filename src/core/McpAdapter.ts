@@ -1,35 +1,20 @@
-import { McpServiceSpecification, ToolCall, ParseFns } from "./types";
+import { McpServiceSpecification, DelimiterConfig, ToolCall } from "./types";
+import { wrapInput, unwrapOutput } from "./parseInternal";
 
 /**
- * Purely functional MCP adapter. Parsing behavior is fully injected.
+ * Functional MCP adapter — orchestrates wrapping/unwrapping using pure utils.
  */
 export class McpAdapter {
   constructor(
     private readonly serviceConfig: McpServiceSpecification,
-    private readonly parseFns: ParseFns
+    private readonly delimiterConfig: DelimiterConfig
   ) {}
 
   wrapInput(rawInput: string): string {
-    const manifest = this.serviceConfig.describe();
-    return [
-      `<<MCP-SERVICES>>`,
-      JSON.stringify(manifest),
-      `<</MCP-SERVICES>>`,
-      rawInput,
-    ].join("\n");
+    return wrapInput(rawInput, this.serviceConfig);
   }
 
   unwrapOutput(output: string): ToolCall[] {
-    const blocks = this.parseFns.extractToolBlocks(output);
-    const calls: ToolCall[] = [];
-
-    for (const block of blocks) {
-      const name = this.parseFns.extractToolName(block);
-      const paramBlock = this.parseFns.extractParamsBlock(block);
-      const args = paramBlock ? this.parseFns.parseParams(paramBlock) : {};
-      calls.push({ name, args, rawBlock: block });
-    }
-
-    return calls;
+    return unwrapOutput(output, this.delimiterConfig, this.serviceConfig);
   }
 }

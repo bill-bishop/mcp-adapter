@@ -1,6 +1,5 @@
 import assert from "assert";
 import { McpAdapter } from "../core/McpAdapter";
-import { buildParseFns } from "../core/parseUtils";
 import { DelimiterConfig } from "../core/types";
 
 const config: DelimiterConfig = {
@@ -9,8 +8,6 @@ const config: DelimiterConfig = {
   format: "json",
 };
 
-const parseFns = buildParseFns(config);
-
 const serviceConfig = {
   describe: () => ({
     math: { description: "Basic calculator" },
@@ -18,7 +15,7 @@ const serviceConfig = {
   }),
 };
 
-const adapter = new McpAdapter(serviceConfig, parseFns);
+const adapter = new McpAdapter(serviceConfig, config);
 
 // Mock model output with two tool calls
 const modelOutput = `
