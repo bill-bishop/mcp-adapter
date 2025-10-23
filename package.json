@@ -1,9 +1,9 @@
 {
   "name": "mcp-adapter",
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
-    "test": "node --loader ts-node/esm src/tests/McpAdapter.test.ts"
+    "test": "ts-node src/tests/McpAdapter.test.ts"
   },
   "devDependencies": {
     "ts-node": "^10.9.1",
