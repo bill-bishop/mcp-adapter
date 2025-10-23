@@ -1,9 +1,7 @@
 import assert from "assert";
 import { McpAdapter } from "../core/McpAdapter";
-import { DelimiterConfig } from "../core/types";
 
 // --- Shared delimiter configuration ---
-const config: DelimiterConfig = {
   service: { start: "<<MCP-SERVICES>>", end: "<</MCP-SERVICES>>" },
   tool: { start: "<<TOOL>>", end: "<</TOOL>>" },
   params: { start: "<<PARAMS>>", end: "<</PARAMS>>" },
@@ -57,7 +55,7 @@ const everythingService = {
 // --- Tests ---
 (async () => {
   console.log("\n🧩 Integration Test: Microsoft Learn MCP Mock");
-  const learnAdapter = new McpAdapter(microsoftLearnService, config);
+  const learnAdapter = new McpAdapter(microsoftLearnService;
 
   const mockOutput = `
   <<TOOL>>
@@ -77,7 +75,7 @@ const everythingService = {
   console.log("✅ Microsoft Learn execute mock successful");
 
   console.log("\n🧩 Integration Test: Everything MCP Mock");
-  const everythingAdapter = new McpAdapter(everythingService, config);
+  const everythingAdapter = new McpAdapter(everythingService;
 
   const mockEverythingOutput = `
   <<TOOL>>

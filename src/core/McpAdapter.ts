@@ -1,3 +1,4 @@
+import { defaultDelimiterConfig } from "../core/delimiterConfig";
 import { McpServiceSpecification, DelimiterConfig, ToolCall } from "./types";
 import { wrapInput, unwrapOutput } from "./parseInternal";
 import { executeToolCalls } from "./executeInternal";
@@ -8,15 +9,15 @@ import { executeToolCalls } from "./executeInternal";
 export class McpAdapter {
   constructor(
     private readonly serviceConfig: McpServiceSpecification,
-    private readonly delimiterConfig: DelimiterConfig
+    
   ) {}
 
   wrapInput(rawInput: string): string {
-    return wrapInput(rawInput, this.serviceConfig, this.delimiterConfig);
+    return wrapInput(rawInput, this.serviceConfig, defaultDelimiterConfig);
   }
 
   unwrapOutput(output: string): ToolCall[] {
-    return unwrapOutput(output, this.delimiterConfig, this.serviceConfig);
+    return unwrapOutput(output, defaultDelimiterConfig, this.serviceConfig);
   }
 
   /**
