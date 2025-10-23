@@ -1,7 +1,4 @@
-import { McpServiceSpecification, ToolCall } from "./types";
-import { wrapInput, unwrapOutput } from "./parseInternal";
-import { executeToolCalls } from "./executeInternal";
-import {DELIMITER_CONFIG} from "../config";
+import { wrapInput, unwrapOutput, executeToolCalls, McpServiceSpecification, ToolCall, DELIMITER_CONFIG } from "./";
 
 /**
  * Functional MCP adapter — orchestrates wrapping/unwrapping and delegates execution.
