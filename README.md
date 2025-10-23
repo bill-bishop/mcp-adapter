@@ -2,18 +2,28 @@
 
 [![Build Status](https://github.com/bill-bishop/mcp-adapter/actions/workflows/build.yml/badge.svg)](https://github.com/bill-bishop/mcp-adapter/actions/workflows/build.yml)
 
-A minimal, functional adapter for MCP service specifications.  
-Handles wrapping and unwrapping of tool calls using configurable delimiters.
+A minimal, functional adapter for Model Context Protocol (MCP) services.  
+Supports configurable wrapping, unwrapping, and execution of tool calls.
 
 ---
 
-## Usage
+## Features
+
+- 🧱 **Config-driven delimiters** for service, tool, and parameter blocks  
+- ⚙️ **Pure functional core** — parsing and execution separated from orchestration  
+- 🚀 **Async execution** of defined MCP tools  
+- 🧪 Fully tested and CI-verified
+
+---
+
+## Example
 
 ```ts
 import { McpAdapter } from "./core/McpAdapter";
 import { DelimiterConfig } from "./core/types";
 
 const delimiterConfig: DelimiterConfig = {
+  service: { start: "<<MCP-SERVICES>>", end: "<</MCP-SERVICES>>" },
   tool: { start: "<<TOOL>>", end: "<</TOOL>>" },
   params: { start: "<<PARAMS>>", end: "<</PARAMS>>" },
   format: "json",
@@ -21,14 +31,21 @@ const delimiterConfig: DelimiterConfig = {
 
 const serviceConfig = {
   describe: () => ({
-    math: { description: "Basic calculator" },
-    weather: { description: "Weather info" },
+    tools: {
+      weather: {
+        description: "Fetch weather info",
+        async execute(args) {
+          // In practice: call real service API here
+          return { temperature: "22°C", city: args.city };
+        },
+      },
+    },
   }),
 };
 
 const adapter = new McpAdapter(serviceConfig, delimiterConfig);
 
-const output = `
+const modelOutput = `
 <<TOOL>>
 weather
 <<PARAMS>>
@@ -37,7 +54,21 @@ weather
 <</TOOL>>
 `;
 
-console.log(adapter.unwrapOutput(output));
+(async () => {
+  const toolCalls = adapter.unwrapOutput(modelOutput);
+  const results = await adapter.execute(toolCalls);
+  console.log(results);
+})();
+```
+
+Output:
+```json
+[
+  {
+    "name": "weather",
+    "result": { "temperature": "22°C", "city": "London" }
+  }
+]
 ```
 
 ---
