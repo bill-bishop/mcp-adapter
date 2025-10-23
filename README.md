@@ -16,59 +16,15 @@ Supports configurable wrapping, unwrapping, and execution of tool calls.
 
 ---
 
-## Example
+## Example Usage
 
-```ts
-import { McpAdapter } from "./core/McpAdapter";
-import { DelimiterConfig } from "./core/types";
+See [`sample/openai/index.js`](./sample/openai/index.js) for a complete runnable example using OpenAI and a live weather API.
 
-const delimiterConfig: DelimiterConfig = {
-  service: { start: "<<MCP-SERVICES>>", end: "<</MCP-SERVICES>>" },
-  tool: { start: "<<TOOL>>", end: "<</TOOL>>" },
-  params: { start: "<<PARAMS>>", end: "<</PARAMS>>" },
-  format: "json",
-};
+Run locally:
 
-const serviceConfig = {
-  describe: () => ({
-    tools: {
-      weather: {
-        description: "Fetch weather info",
-        async execute(args) {
-          // In practice: call real service API here
-          return { temperature: "22°C", city: args.city };
-        },
-      },
-    },
-  }),
-};
-
-const adapter = new McpAdapter(serviceConfig, delimiterConfig);
-
-const modelOutput = `
-<<TOOL>>
-weather
-<<PARAMS>>
-{ "city": "London" }
-<</PARAMS>>
-<</TOOL>>
-`;
-
-(async () => {
-  const toolCalls = adapter.unwrapOutput(modelOutput);
-  const results = await adapter.execute(toolCalls);
-  console.log(results);
-})();
-```
-
-Output:
-```json
-[
-  {
-    "name": "weather",
-    "result": { "temperature": "22°C", "city": "London" }
-  }
-]
+```bash
+npm install openai node-fetch
+OPENAI_API_KEY=your-key-here node sample/openai/index.js
 ```
 
 ---
