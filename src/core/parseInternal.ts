@@ -39,12 +39,16 @@ export function parseParams(paramBlock: string | null, config: DelimiterConfig):
   return { raw: paramBlock };
 }
 
-export function wrapInput(rawInput: string, serviceConfig: McpServiceSpecification): string {
+export function wrapInput(
+  rawInput: string,
+  serviceConfig: McpServiceSpecification,
+  config: DelimiterConfig
+): string {
   const manifest = serviceConfig.describe();
   return [
-    `<<MCP-SERVICES>>`,
+    config.service.start,
     JSON.stringify(manifest),
-    `<</MCP-SERVICES>>`,
+    config.service.end,
     rawInput,
   ].join("\n");
 }

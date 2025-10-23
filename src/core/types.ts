@@ -5,6 +5,10 @@ export interface ToolCall {
 }
 
 export interface DelimiterConfig {
+  service: {
+    start: string;
+    end: string;
+  };
   tool: {
     start: string;
     end: string;
@@ -18,14 +22,4 @@ export interface DelimiterConfig {
 
 export interface McpServiceSpecification {
   describe(): Record<string, unknown>;
-}
-
-/**
- * Parser utility functions provided via configuration.
- */
-export interface ParseFns {
-  extractToolBlocks: (output: string) => string[];
-  extractToolName: (toolBlock: string) => string;
-  extractParamsBlock: (toolBlock: string) => string | null;
-  parseParams: (paramBlock: string) => Record<string, unknown>;
 }

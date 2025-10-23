@@ -11,7 +11,7 @@ export class McpAdapter {
   ) {}
 
   wrapInput(rawInput: string): string {
-    return wrapInput(rawInput, this.serviceConfig);
+    return wrapInput(rawInput, this.serviceConfig, this.delimiterConfig);
   }
 
   unwrapOutput(output: string): ToolCall[] {

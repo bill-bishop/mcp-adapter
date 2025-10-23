@@ -3,6 +3,7 @@ import { McpAdapter } from "../core/McpAdapter";
 import { DelimiterConfig } from "../core/types";
 
 const config: DelimiterConfig = {
+  service: { start: "<<MCP-SERVICES>>", end: "<</MCP-SERVICES>>" },
   tool: { start: "<<TOOL>>", end: "<</TOOL>>" },
   params: { start: "<<PARAMS>>", end: "<</PARAMS>>" },
   format: "json",
@@ -16,6 +17,12 @@ const serviceConfig = {
 };
 
 const adapter = new McpAdapter(serviceConfig, config);
+
+// Verify wrapInput includes service delimiters
+const wrapped = adapter.wrapInput("raw-input");
+assert(wrapped.includes(config.service.start));
+assert(wrapped.includes(config.service.end));
+assert(wrapped.includes("raw-input"));
 
 // Mock model output with two tool calls
 const modelOutput = `
