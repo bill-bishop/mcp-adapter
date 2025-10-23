@@ -4,6 +4,12 @@ export interface ToolCall {
   rawBlock?: string;
 }
 
+export interface McpTool {
+  description: string;
+  parameters?: Record<string, string>;
+  execute: (args: Record<string, unknown>) => Promise<unknown>;
+}
+
 export interface DelimiterConfig {
   service: {
     start: string;
@@ -21,5 +27,5 @@ export interface DelimiterConfig {
 }
 
 export interface McpServiceSpecification {
-  describe(): Record<string, unknown>;
+  describe(): { tools: Record<string, McpTool> };
 }

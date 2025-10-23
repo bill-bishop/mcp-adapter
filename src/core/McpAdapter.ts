@@ -17,4 +17,29 @@ export class McpAdapter {
   unwrapOutput(output: string): ToolCall[] {
     return unwrapOutput(output, this.delimiterConfig, this.serviceConfig);
   }
+
+  /**
+   * Executes a list of ToolCalls by delegating to the tool definitions in serviceConfig.
+   */
+  async execute(toolCalls: ToolCall[]): Promise<Record<string, unknown>[]> {
+    const manifest = this.serviceConfig.describe();
+    const tools = manifest.tools || {};
+    const results: Record<string, unknown>[] = [];
+
+    for (const call of toolCalls) {
+      const tool = tools[call.name];
+      if (tool && typeof tool.execute === "function") {
+        try {
+          const result = await tool.execute(call.args);
+          results.push({ name: call.name, result });
+        } catch (err) {
+          results.push({ name: call.name, error: String(err) });
+        }
+      } else {
+        results.push({ name: call.name, error: "Tool not found or not executable" });
+      }
+    }
+
+    return results;
+  }
 }
