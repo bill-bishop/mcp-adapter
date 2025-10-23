@@ -18,11 +18,13 @@ const serviceConfig = {
 
 const adapter = new McpAdapter(serviceConfig, config);
 
-// Verify wrapInput includes service delimiters
+// Verify wrapInput includes service delimiters and manifest content
 const wrapped = adapter.wrapInput("raw-input");
 assert(wrapped.includes(config.service.start));
 assert(wrapped.includes(config.service.end));
 assert(wrapped.includes("raw-input"));
+assert(wrapped.includes("math"));
+assert(wrapped.includes("weather"));
 
 // Mock model output with two tool calls
 const modelOutput = `
