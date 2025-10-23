@@ -18,13 +18,13 @@ Supports configurable wrapping, unwrapping, and execution of tool calls.
 
 ## Example Usage
 
-See [`sample/openai/index.js`](./sample/openai/index.js) for a complete runnable example using OpenAI and a live weather API.
+See [`sample/openai/index.js`](./sample/openai/index.ts) for a complete runnable example using OpenAI and a live weather API.
 
-Run locally:
+Run sample file locally:
 
 ```bash
 npm install openai node-fetch
-OPENAI_API_KEY=your-key-here node sample/openai/index.js
+OPENAI_API_KEY=your-key-here npm run test:weather
 ```
 
 ---

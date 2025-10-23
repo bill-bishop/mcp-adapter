@@ -1,6 +1,5 @@
 import assert from "assert";
-import { McpAdapter } from "../core/McpAdapter";
-import { DelimiterConfig, McpServiceSpecification } from "../core/types";
+import {McpAdapter, DelimiterConfig, McpServiceSpecification, McpTool} from "../core";
 
 const config: DelimiterConfig = {
   service: { start: "<<MCP-SERVICES>>", end: "<</MCP-SERVICES>>" },
@@ -17,18 +16,18 @@ const serviceConfig: McpServiceSpecification = {
         async execute(args) {
           return { mathResult: `Evaluated: ${args.expression}` };
         },
-      },
+      } as McpTool,
       weather: {
         description: "Weather info",
         async execute(args) {
           return { weatherData: `Weather for ${args.city}` };
         },
-      },
+      } as McpTool,
     },
   }),
 };
 
-const adapter = new McpAdapter(serviceConfig, config);
+const adapter = new McpAdapter(serviceConfig);
 
 // Verify wrapInput includes service delimiters
 const wrapped = adapter.wrapInput("raw-input");

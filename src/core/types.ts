@@ -1,13 +1,13 @@
 export interface ToolCall {
   name: string;
-  args: Record<string, unknown>;
+  args: Record<string, string>;
   rawBlock?: string;
 }
 
 export interface McpTool {
   description: string;
   parameters?: Record<string, string>;
-  execute: (args: Record<string, unknown>) => Promise<unknown>;
+  execute<T>(args: Record<string, string>): Promise<T>;
 }
 
 export interface DelimiterConfig {

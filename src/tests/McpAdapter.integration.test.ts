@@ -1,55 +1,46 @@
 import assert from "assert";
-import { McpAdapter } from "../core/McpAdapter";
-import { DelimiterConfig } from "../core/types";
-
-// --- Shared delimiter configuration ---
-const config: DelimiterConfig = {
-  service: { start: "<<MCP-SERVICES>>", end: "<</MCP-SERVICES>>" },
-  tool: { start: "<<TOOL>>", end: "<</TOOL>>" },
-  params: { start: "<<PARAMS>>", end: "<</PARAMS>>" },
-  format: "json",
-};
+import {McpAdapter, McpServiceSpecification, McpTool} from "../core";
 
 // --- Microsoft Learn MCP mock ---
-const microsoftLearnService = {
+const microsoftLearnService: McpServiceSpecification = {
   describe: () => ({
     tools: {
       microsoft_docs_search: {
         description: "Search Microsoft Learn documentation.",
         parameters: { query: "string" },
-        async execute(args) {
+        async execute(args: Record<string, unknown>) {
           return { searchResult: `Searched Learn docs for '${args.query}'` };
         },
-      },
+      } as McpTool,
       microsoft_docs_fetch: {
         description: "Fetch a Microsoft Learn document by ID.",
         parameters: { id: "string" },
-        async execute(args) {
+        async execute(args: Record<string, unknown>) {
           return { document: `Fetched doc with ID '${args.id}'` };
         },
-      },
+      } as McpTool,
     },
   }),
 };
 
 // --- Everything MCP mock ---
-const everythingService = {
+const everythingService: McpServiceSpecification = {
   describe: () => ({
     tools: {
       web_fetch: {
         description: "Fetch web resources.",
         parameters: { url: "string" },
-        async execute(args) {
+        async execute(args: Record<string, unknown>) {
           return { fetchData: `Fetched URL ${args.url}` };
         },
-      },
+      } as McpTool,
       filesystem_list: {
         description: "List directory contents.",
         parameters: { path: "string" },
-        async execute(args) {
+        async execute(args: Record<string, unknown>) {
           return { directoryContents: ["file1.txt", "file2.txt"], path: args.path };
         },
-      },
+      } as McpTool,
     },
   }),
 };
@@ -57,7 +48,7 @@ const everythingService = {
 // --- Tests ---
 (async () => {
   console.log("\n🧩 Integration Test: Microsoft Learn MCP Mock");
-  const learnAdapter = new McpAdapter(microsoftLearnService, config);
+  const learnAdapter = new McpAdapter(microsoftLearnService);
 
   const mockOutput = `
   <<TOOL>>
@@ -77,7 +68,7 @@ const everythingService = {
   console.log("✅ Microsoft Learn execute mock successful");
 
   console.log("\n🧩 Integration Test: Everything MCP Mock");
-  const everythingAdapter = new McpAdapter(everythingService, config);
+  const everythingAdapter = new McpAdapter(everythingService);
 
   const mockEverythingOutput = `
   <<TOOL>>

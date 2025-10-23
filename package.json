@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "type": "commonjs",
   "scripts": {
-    "test": "ts-node-script src/tests/McpAdapter.test.ts"
+    "test": "ts-node-script src/tests/McpAdapter.test.ts",
+    "test:weather": "ts-node-script sample/openai/index.ts"
   },
   "devDependencies": {
+    "node-fetch": "^3.3.2",
+    "openai": "^6.6.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.3.3"
   }

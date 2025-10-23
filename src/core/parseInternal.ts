@@ -27,7 +27,7 @@ export function extractParamsBlock(toolBlock: string, config: DelimiterConfig): 
   return match ? match[1].trim() : null;
 }
 
-export function parseParams(paramBlock: string | null, config: DelimiterConfig): Record<string, unknown> {
+export function parseParams(paramBlock: string | null, config: DelimiterConfig): Record<string, string> {
   if (!paramBlock) return {};
   if (config.format === "json") {
     try {
@@ -56,7 +56,6 @@ export function wrapInput(
 export function unwrapOutput(
   output: string,
   config: DelimiterConfig,
-  serviceConfig: McpServiceSpecification
 ): ToolCall[] {
   const blocks = extractToolBlocks(output, config);
   const calls: ToolCall[] = [];
