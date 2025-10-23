@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "commonjs",
   "scripts": {
-    "test": "ts-node src/tests/McpAdapter.test.ts"
+    "test": "node -r ts-node/register src/tests/McpAdapter.test.ts"
   },
   "devDependencies": {
     "ts-node": "^10.9.1",
