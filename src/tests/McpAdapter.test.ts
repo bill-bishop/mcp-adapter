@@ -30,8 +30,8 @@ const adapter = new McpAdapter(serviceConfig;
 
 // Verify wrapInput includes service delimiters
 const wrapped = adapter.wrapInput("raw-input");
-
-
+assert(wrapped.includes(config.service.start));
+assert(wrapped.includes(config.service.end));
 assert(wrapped.includes("raw-input"));
 assert(wrapped.includes("math"));
 assert(wrapped.includes("weather"));
