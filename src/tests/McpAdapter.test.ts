@@ -1,6 +1,6 @@
 import assert from "assert";
 import { McpAdapter } from "../core/McpAdapter";
-import { DelimiterConfig } from "../core/types";
+import { DelimiterConfig, McpServiceSpecification } from "../core/types";
 
 const config: DelimiterConfig = {
   service: { start: "<<MCP-SERVICES>>", end: "<</MCP-SERVICES>>" },
@@ -9,16 +9,28 @@ const config: DelimiterConfig = {
   format: "json",
 };
 
-const serviceConfig = {
+const serviceConfig: McpServiceSpecification = {
   describe: () => ({
-    math: { description: "Basic calculator" },
-    weather: { description: "Weather info" },
+    tools: {
+      math: {
+        description: "Basic calculator",
+        async execute(args) {
+          return { result: `Evaluated: ${args.expression}` };
+        },
+      },
+      weather: {
+        description: "Weather info",
+        async execute(args) {
+          return { result: `Weather for ${args.city}` };
+        },
+      },
+    },
   }),
 };
 
 const adapter = new McpAdapter(serviceConfig, config);
 
-// Verify wrapInput includes service delimiters and manifest content
+// Verify wrapInput includes service delimiters
 const wrapped = adapter.wrapInput("raw-input");
 assert(wrapped.includes(config.service.start));
 assert(wrapped.includes(config.service.end));
@@ -45,12 +57,19 @@ math
 <</TOOL>>
 `;
 
-const toolCalls = adapter.unwrapOutput(modelOutput);
+(async () => {
+  const toolCalls = adapter.unwrapOutput(modelOutput);
 
-assert.equal(toolCalls.length, 2);
-assert.deepStrictEqual(toolCalls[0].name, "weather");
-assert.deepStrictEqual(toolCalls[0].args, { city: "London" });
-assert.deepStrictEqual(toolCalls[1].name, "math");
-assert.deepStrictEqual(toolCalls[1].args, { expression: "2 + 2" });
+  assert.equal(toolCalls.length, 2);
+  assert.deepStrictEqual(toolCalls[0].name, "weather");
+  assert.deepStrictEqual(toolCalls[0].args, { city: "London" });
+  assert.deepStrictEqual(toolCalls[1].name, "math");
+  assert.deepStrictEqual(toolCalls[1].args, { expression: "2 + 2" });
 
-console.log("✅ McpAdapter parsing test passed!");
+  const results = await adapter.execute(toolCalls);
+  assert.equal(results.length, 2);
+  assert(results[0].result.result.includes("London"));
+  assert(results[1].result.result.includes("2 + 2"));
+
+  console.log("✅ McpAdapter parsing + execution test passed!");
+})();
