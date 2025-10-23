@@ -5,6 +5,7 @@ import fetch from "node-fetch";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+const delimiterConfig = {
   service: { start: "<<MCP-SERVICES>>", end: "<</MCP-SERVICES>>" },
   tool: { start: "<<TOOL>>", end: "<</TOOL>>" },
   params: { start: "<<PARAMS>>", end: "<</PARAMS>>" },
@@ -29,6 +30,7 @@ const serviceConfig = {
   }),
 };
 
+const adapter = new McpAdapter(serviceConfig, delimiterConfig);
 
 async function main() {
   console.log("🌤  MCP + OpenAI Weather Demo\n");

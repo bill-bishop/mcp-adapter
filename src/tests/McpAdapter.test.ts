@@ -1,6 +1,8 @@
 import assert from "assert";
 import { McpAdapter } from "../core/McpAdapter";
+import { DelimiterConfig, McpServiceSpecification } from "../core/types";
 
+const config: DelimiterConfig = {
   service: { start: "<<MCP-SERVICES>>", end: "<</MCP-SERVICES>>" },
   tool: { start: "<<TOOL>>", end: "<</TOOL>>" },
   params: { start: "<<PARAMS>>", end: "<</PARAMS>>" },
@@ -26,7 +28,7 @@ const serviceConfig: McpServiceSpecification = {
   }),
 };
 
-const adapter = new McpAdapter(serviceConfig;
+const adapter = new McpAdapter(serviceConfig, config);
 
 // Verify wrapInput includes service delimiters
 const wrapped = adapter.wrapInput("raw-input");
