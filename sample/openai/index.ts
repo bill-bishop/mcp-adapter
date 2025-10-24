@@ -1,59 +1,108 @@
 import OpenAI from "openai";
-import {McpAdapter, McpServiceSpecification} from "../../src/core";
-import fetch from "node-fetch";
-import {ResponseCreateParamsNonStreaming} from "openai/src/resources/responses/responses";
+import {McpAdapter, McpServiceSpecification, ToolCall} from "../../src/core";
+import {EasyInputMessage, Response, ResponseCreateParamsNonStreaming} from "openai/src/resources/responses/responses";
+import {getWeather, GetWeatherRequest} from "../functions/getWeather";
+// import {CompletionCreateParamsNonStreaming} from "openai/resources/completions";
+/*import {
+  // ChatCompletion,
+  ChatCompletionCreateParams,
+  ChatCompletionMessageParam
+} from "openai/resources/chat/completions/completions";*/
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-interface WeatherApiResponse {current_condition: {temp_C: number, weatherDesc: {value: string}[]}[]}
+const MODEL_CONFIG = {
+  model: "gpt-5-nano",
+  baseSystemPrompt: "You are a helpful Assistant with tooling capabilities.",
+};
+
+const LOGGER = {
+  startUp: "🌤  MCP + OpenAI Weather Demo",
+  input: "Input",
+  output: "Output (Responses API)",
+  outputCompletions: "Output (Completions API)",
+  noToolCalls: "⚠️ No tool calls detected.",
+  toolResults: "✅ Tool Execution Results:",
+  exit: "Sample run complete ✅",
+};
+
+enum ChatRole {
+  SYSTEM = "system",
+  USER = "user",
+  ASSISTANT = "assistant",
+  TOOL_RESULT = "system", // ?
+}
 
 const serviceConfig: McpServiceSpecification  = {
   describe: () => ({
     tools: {
       weather: {
         description: "Fetch current weather for a given city",
-        async execute<WeatherToolResult>(args: Record<string, string>): Promise<WeatherToolResult> {
-          const city: string = args.g || "London";
-          const resp = await fetch(`https://wttr.in/${encodeURIComponent(city)}?format=j1`);
-          const data = await resp.json() as WeatherApiResponse;
-          const temp = data.current_condition?.[0]?.temp_C;
-          const desc = data.current_condition?.[0]?.weatherDesc?.[0]?.value;
-          return {city, temperature_C: temp, condition: desc} as WeatherToolResult;
+        async execute<GetWeatherResponse>(args: Record<string, string>): Promise<GetWeatherResponse> {
+          const request: GetWeatherRequest = { city: args.city };
+          return await getWeather(request) as GetWeatherResponse;
         },
       },
     },
   }),
 };
 
-const adapter = new McpAdapter(serviceConfig);
 
-async function main() {
-  console.log("🌤  MCP + OpenAI Weather Demo\n");
-
-  const systemPrompt = adapter.wrapInput("");
-  const userPrompt = "What's the weather like in Paris today?";
-  const modelInput = [
-    { role: "system", content: systemPrompt },
-    { role: "user", content: userPrompt },
+async function main(userPrompt: string) {
+  const toolAdapter: McpAdapter = new McpAdapter(serviceConfig);
+  const systemPrompt: string = toolAdapter.wrapInput(MODEL_CONFIG.baseSystemPrompt);
+  let chatHistory: EasyInputMessage[] = [
+    { role: ChatRole.SYSTEM, content: systemPrompt },
+    { role: ChatRole.USER, content: userPrompt },
   ];
-
-  const completion = await client.responses.create({
-    input: [ ...modelInput ],
-    model: "gpt-4.1-mini",
-  } as ResponseCreateParamsNonStreaming);
-
-  const modelOutput = completion.output_text || "";
-  console.log("--> Model Input:\n", modelInput, "\n");
-  console.log("<-- Model Output:\n", modelOutput, "\n");
-
-  const toolCalls = adapter.unwrapOutput(modelOutput);
-  if (toolCalls.length === 0) {
-    console.log("⚠️ No tool calls detected.");
-    return;
+  const responsesCreateRequest: ResponseCreateParamsNonStreaming = {
+    input: chatHistory,
+    model: MODEL_CONFIG.model,
   }
 
-  const results = await adapter.execute(toolCalls);
-  console.log("✅ Tool Execution Results:\n", JSON.stringify(results, null, 2));
+  // Responses API
+  let responses: Response = await client.responses.create(responsesCreateRequest);
+  let modelOutput: string = String(responses.output_text);
+
+  // Completions API
+  /*  const completionsCreateRequest: ChatCompletionCreateParams = {
+      model: MODEL_CONFIG.model,
+      messages: chatHistory as ChatCompletionMessageParam[],
+    }*/
+  // let completions: ChatCompletion = await client.chat.completions.create(completionsCreateRequest);
+  // let modelOutput: string = completions.choices.reduce((acc, choice) => acc + choice.message.content, '');
+
+  chatHistory.push({
+    role: ChatRole.ASSISTANT,
+    content: modelOutput,
+  });
+
+  let toolCalls: ToolCall[] = toolAdapter.unwrapOutput(modelOutput);
+  if (toolCalls.length > 0) {
+    let results: Record<string, unknown>[] = await toolAdapter.execute(toolCalls);
+    let resultsStr: string = JSON.stringify(results, null, 2);
+
+    chatHistory.push({
+      role: ChatRole.TOOL_RESULT,
+      content: resultsStr,
+    });
+
+    console.log(LOGGER.startUp);
+    console.log(LOGGER.input, chatHistory);
+    console.log(LOGGER.output, modelOutput);
+    console.log(LOGGER.toolResults, resultsStr);
+
+    // 2nd loop
+    responses = await client.responses.create(responsesCreateRequest);
+    modelOutput = String(responses.output_text);
+  }
+  else {
+    console.log(LOGGER.noToolCalls);
+  }
+
+  console.log(LOGGER.input, chatHistory);
+  console.log(LOGGER.output, modelOutput);
+  console.log(LOGGER.exit);
 }
 
-main().catch(console.error);
+main("What's the weather like in Phoenix today?").catch(console.error);
