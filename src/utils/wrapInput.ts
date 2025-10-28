@@ -15,7 +15,7 @@ export function wrapInput(
     const { tool, params } = config;
 
     const instruction = `
-When you need to use a tool, append the calls to the end of your output:
+If you decide to call tools, DO NOT ADD OUTPUT after ${tool.end}
 
 ${tool.start}
 tool_name
@@ -27,18 +27,24 @@ ${params.start}
 ${params.end}
 ${tool.end}
 
-The tool result will be returned to you in the next input, at which point you can finish your final user-facing response.
+Ensure opening and closing delimiters are properly placed. The tool result will be returned to you in the next input, at which point you can finish your final user-facing response.
 
 Example:
-User input: check the weather in London!
+User: check the weather in London!
 
-Assistant: Sure thing, checking now ... 
+Assistant: 
 ${tool.start}
 weather
 ${params.start}
-{ "city": "London" }
+{ "city": "Boiling Pointe" }
 ${params.end}
 ${tool.end}
+
+System:
+{ temp_F: 212, temp_C: 100 }
+
+Assistant:
+The temperature in Boiling Pointe is 100 Celsius, or 212 degrees Farenheight
 `;
 
     return [

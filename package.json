@@ -4,7 +4,7 @@
   "type": "commonjs",
   "scripts": {
     "test": "ts-node-script src/tests/McpAdapter.test.ts",
-    "test:weather": "ts-node-script sample/openai/index.ts"
+    "test:tools": "ts-node-script sample/openai/index.ts"
   },
   "devDependencies": {
     "node-fetch": "^3.3.2",

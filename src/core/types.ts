@@ -7,7 +7,7 @@ export interface ToolCall {
 export interface McpTool {
   description: string;
   parameters?: Record<string, string>;
-  execute<T>(args: Record<string, string>): Promise<T>;
+  execute(args: Record<string, string>): Promise<unknown>;
 }
 
 export interface DelimiterConfig {
